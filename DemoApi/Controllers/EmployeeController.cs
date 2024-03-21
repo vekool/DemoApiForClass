@@ -26,10 +26,34 @@ namespace DemoApi.Controllers
         /// </summary>
         /// <returns>List of Employees</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployees()
+        public async Task<ActionResult<IEnumerable<EmployeeDeptDTO>>> GetAllEmployees()
         {
-            Employee[] e = await dc.Employees.ToArrayAsync();
-            return Ok(e);
+            EmployeeDeptDTO[] edt = await (from e in dc.Employees
+                                           join d in dc.Departments
+                                           on e.DepartmentDID equals d.DID into t
+                                           from d in t.DefaultIfEmpty()
+                                           select new EmployeeDeptDTO
+                                           {
+                                               DepartmentName = d == null?"NA":d.DName,
+                                              DeptId = d == null?0:d.DID,
+                                               EName = e.EName,
+                                               ESalary = e.ESalary,
+                                               EID = e.EID
+                                           }).ToArrayAsync();
+            return Ok(edt);
+            //Employee[] e = await dc.Employees.ToArrayAsync();
+            //return Ok(e);
+                //EmployeeDeptDTO[] edt = await (from e in dc.Employees
+                //                               join d in dc.Departments
+                //                               on e.DeptId equals d.DID
+                //                               select new EmployeeDeptDTO
+                //                               {
+                //                                   DepartmentName = d.DName,
+                //                                   DeptId = d.DID,
+                //                                   EName = e.EName,
+                //                                   ESalary = e.ESalary,
+                //                                   EID = e.EID
+                //                               }).ToArrayAsync();
         }
 
         /// <summary>

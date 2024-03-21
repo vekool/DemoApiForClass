@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DemoApi.Models
 {
-    public class Employee
+    public class EmployeeDeptDTO
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public int EID { get; set; }
         [Required]
@@ -14,9 +12,7 @@ namespace DemoApi.Models
         [Range(20000, 1000000)]
         public double ESalary { get; set; }
 
-        public int? DepartmentDID { get; set; }
-
-        [ForeignKey("DepartmentDID")]
-        public virtual Department Department { get; }
+        public string DepartmentName { get; set; }
+        public int DeptId   { get; set; }
     }
 }
