@@ -85,7 +85,7 @@ namespace DemoApi.Controllers
             {
                 return NotFound("No Employee Id Specified");
             }
-            Employee e = await dc.Employees.FindAsync(id);
+            Employee e = await dc.Employees.FindAsync(id.Value);
             if (e == null)
             {
                 return NotFound("No Employee Found");

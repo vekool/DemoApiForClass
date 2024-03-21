@@ -13,5 +13,10 @@ namespace DemoApi.Models
         [Required]
         [Range(20000, 1000000)]
         public double ESalary { get; set; }
+
+        public int? DeptId { get; set; }
+
+        [ForeignKey("DeptId")]
+        public virtual Department Department { get; }
     }
 }
