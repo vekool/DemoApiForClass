@@ -1,7 +1,10 @@
 ﻿using DemoApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace DemoApi.Controllers
 {
@@ -13,13 +16,15 @@ namespace DemoApi.Controllers
     public class EmployeeController : ControllerBase
     {
         readonly DemoContext dc;
+        private IMemoryCache cache;
         /// <summary>
         /// Constructor for injecting Democontext by the framework
         /// </summary>
         /// <param name="dc"></param>
-        public EmployeeController(DemoContext dc)
+        public EmployeeController(DemoContext dc, IMemoryCache cache)
         {
             this.dc = dc;
+            this.cache = cache;
         }
         /// <summary>
         /// Get all employees
@@ -55,7 +60,9 @@ namespace DemoApi.Controllers
                 //                                   EID = e.EID
                 //                               }).ToArrayAsync();
         }
-
+        //www.mywebsite.com ---  www.
+        //www.anotherwebsite.com --- www.
+        //CORS: Cross Origin Request Sharing 
         /// <summary>
         /// Get employee by id
         /// </summary>
@@ -65,20 +72,33 @@ namespace DemoApi.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public async Task<ActionResult<Employee>> GetEmployee(int? id)
         {
             if (!id.HasValue)
             {
                 return NotFound("No Employee Id Specified");
             }
+            //cache: memorycache -
+            // distributed cache
 
-            Employee e = await dc.Employees.FindAsync(id);
-
-            if (e == null)
+          
+            Employee f = new Employee();
+            //Employee e = await dc.Employees.FindAsync(id);
+            string mykey = "SomedataKey";
+            if(cache.TryGetValue(mykey, out f) == false)
             {
-                return NotFound("No Employee Found");
+                var options = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                f = await dc.Employees.FindAsync(id);
+                if(f == null)
+                {
+                        return NotFound("No Employee Found");
+                }
+                cache.Set(mykey, f, options);
             }
-            return Ok(e);
+ 
+
+            return Ok(f);
         }
         /// <summary>
         /// Add an employee
