@@ -1,4 +1,5 @@
-﻿using DemoApi.Models;
+﻿using DemoApi.ActionFilters;
+using DemoApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -107,6 +108,8 @@ namespace DemoApi.Controllers
         /// <returns>The created employee with ID</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [MultipleOf500Filter]
+
         public async Task<ActionResult<Employee>> AddEmployee([Bind(include: "EName, ESalary")] Employee e)
         {
             dc.Employees.Add(e);
@@ -123,6 +126,7 @@ namespace DemoApi.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ServiceFilter(typeof(MyLogResultFilter))]
         public async Task<ActionResult<Employee>> DeleteEmployee(int? id)
         {
             if (!id.HasValue)

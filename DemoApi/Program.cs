@@ -1,4 +1,5 @@
 
+using DemoApi.ActionFilters;
 using DemoApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -22,6 +23,8 @@ namespace DemoApi
             );
             builder.Services.AddSqlServer<DemoContext>(builder.Configuration.GetConnectionString("MyConn"));
             //builder.Services.AddDbContext<DemoContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MyConn")));
+            builder.Services.AddScoped(typeof(MyLogResultFilter));
+            builder.Services.AddScoped(typeof(MultipleOf500Filter));
 
             builder.Services.AddCors(options =>
             {
